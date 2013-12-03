@@ -493,6 +493,8 @@ static void subsystem_powerup(struct subsys_device *dev, void *data)
 #ifdef CONFIG_LGE_HANDLE_PANIC
 		lge_set_magic_subsystem(name, LGE_ERR_SUB_PWR);
 #endif
+                notify_each_subsys_device(&dev, 1, SUBSYS_POWERUP_FAILURE,
+                                                                NULL);
 		panic("[%p]: Powerup error: %s!", current, name);
 	}
 

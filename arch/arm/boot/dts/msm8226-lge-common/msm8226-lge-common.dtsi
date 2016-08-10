@@ -50,5 +50,13 @@
 	i2c@f9927000 { /* BLSP1 QUP5 */
 		qcom,master-id = <86>;
 	};
+
+        ram_console {
+                compatible = "android,ram-console";
+                status = "ok";
+
+                android,ram-buffer-start = <0x3eae0000>;
+                android,ram-buffer-size = <0x20000>;
+        };
 };
 

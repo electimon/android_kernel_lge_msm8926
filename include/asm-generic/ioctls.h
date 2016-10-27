@@ -87,6 +87,9 @@
 #define TIOCSERGETLSR   0x5459 /* Get line status register */
 #define TIOCSERGETMULTI 0x545A /* Get multiport config  */
 #define TIOCSERSETMULTI 0x545B /* Set multiport config */
+#define TIOCPMGET	0x5441	/* PM get */
+#define TIOCPMPUT	0x5442	/* PM put */
+#define TIOCPMACT	0x5443	/* PM is active */
 
 #define TIOCMIWAIT	0x545C	/* wait for a change on serial input line(s) */
 #define TIOCGICOUNT	0x545D	/* read serial port inline interrupt counts */

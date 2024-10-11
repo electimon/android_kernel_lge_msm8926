@@ -17,20 +17,17 @@
 #include <mach/gpio.h>
 #include <mach/gpiomux.h>
 #include <mach/socinfo.h>
-
-static struct gpiomux_setting gpio_spi_config = {
-	.func = GPIOMUX_FUNC_1,
-	.drv = GPIOMUX_DRV_6MA,
-	.pull = GPIOMUX_PULL_NONE,
-};
-static struct gpiomux_setting gpio_spi_susp_config = {
-	.func = GPIOMUX_FUNC_GPIO,
-	.drv = GPIOMUX_DRV_2MA,
-	.pull = GPIOMUX_PULL_DOWN,
-};
+#include <mach/board_lge.h>
 
 static struct gpiomux_setting gpio_i2c_config = {
 	.func = GPIOMUX_FUNC_3,
+	.drv  = GPIOMUX_DRV_2MA,
+	.pull = GPIOMUX_PULL_NONE,
+};
+
+/* GPIO I2C */
+static struct gpiomux_setting gpio_common_i2c_config = {
+	.func = GPIOMUX_FUNC_GPIO,
 	.drv  = GPIOMUX_DRV_2MA,
 	.pull = GPIOMUX_PULL_NONE,
 };
@@ -39,65 +36,6 @@ static struct gpiomux_setting gpio_cam_i2c_config = {
 	.func = GPIOMUX_FUNC_1,
 	.drv  = GPIOMUX_DRV_2MA,
 	.pull = GPIOMUX_PULL_NONE,
-};
-
-static struct gpiomux_setting gpio_nfc_config = {
-	.func = GPIOMUX_FUNC_2,
-	.drv  = GPIOMUX_DRV_2MA,
-	.pull = GPIOMUX_PULL_NONE,
-};
-static struct gpiomux_setting gpio_nfc_sus_config = {
-	.func = GPIOMUX_FUNC_2,
-	.drv  = GPIOMUX_DRV_2MA,
-	.pull = GPIOMUX_PULL_DOWN,
-};
-
-static struct gpiomux_setting atmel_int_act_cfg = {
-	.func = GPIOMUX_FUNC_GPIO,
-	.drv = GPIOMUX_DRV_8MA,
-	.pull = GPIOMUX_PULL_UP,
-};
-
-static struct gpiomux_setting atmel_int_sus_cfg = {
-	.func = GPIOMUX_FUNC_GPIO,
-	.drv = GPIOMUX_DRV_2MA,
-	.pull = GPIOMUX_PULL_DOWN,
-};
-
-static struct gpiomux_setting atmel_reset_act_cfg = {
-	.func = GPIOMUX_FUNC_GPIO,
-	.drv = GPIOMUX_DRV_6MA,
-	.pull = GPIOMUX_PULL_UP,
-};
-
-static struct gpiomux_setting atmel_reset_sus_cfg = {
-	.func = GPIOMUX_FUNC_GPIO,
-	.drv = GPIOMUX_DRV_6MA,
-	.pull = GPIOMUX_PULL_DOWN,
-};
-
-static struct gpiomux_setting focaltech_int_act_cfg = {
-	.func = GPIOMUX_FUNC_GPIO,
-	.drv = GPIOMUX_DRV_8MA,
-	.pull = GPIOMUX_PULL_UP,
-};
-
-static struct gpiomux_setting focaltech_int_sus_cfg = {
-	.func = GPIOMUX_FUNC_GPIO,
-	.drv = GPIOMUX_DRV_2MA,
-	.pull = GPIOMUX_PULL_DOWN,
-};
-
-static struct gpiomux_setting focaltech_reset_act_cfg = {
-	.func = GPIOMUX_FUNC_GPIO,
-	.drv = GPIOMUX_DRV_6MA,
-	.pull = GPIOMUX_PULL_UP,
-};
-
-static struct gpiomux_setting focaltech_reset_sus_cfg = {
-	.func = GPIOMUX_FUNC_GPIO,
-	.drv = GPIOMUX_DRV_6MA,
-	.pull = GPIOMUX_PULL_UP,
 };
 
 static struct gpiomux_setting wcnss_5wire_suspend_cfg = {
@@ -185,13 +123,6 @@ static struct msm_gpiomux_config msm_lcd_configs[] __initdata = {
 		},
 	},
 	{
-		.gpio = 7,
-		.settings = {
-			[GPIOMUX_ACTIVE]    = &lcd_en_act_cfg,
-			[GPIOMUX_SUSPENDED] = &lcd_en_sus_cfg,
-		},
-	},
-	{
 		.gpio = 12,
 		.settings = {
 			[GPIOMUX_ACTIVE]    = &lcd_te_act_config,
@@ -213,6 +144,18 @@ static struct msm_gpiomux_config msm_blsp_configs[] __initdata = {
 		.settings = {
 			[GPIOMUX_ACTIVE] = &gpio_i2c_config,
 			[GPIOMUX_SUSPENDED] = &gpio_i2c_config,
+		},
+	},
+	{
+		.gpio      = 4,		/* GPIO I2C_SDA */
+		.settings = {
+			[GPIOMUX_SUSPENDED] = &gpio_common_i2c_config,
+		},
+	},
+	{
+		.gpio      = 5,		/* GPIO I2C_SCL */
+		.settings = {
+			[GPIOMUX_SUSPENDED] = &gpio_common_i2c_config,
 		},
 	},
 	{
@@ -243,129 +186,7 @@ static struct msm_gpiomux_config msm_blsp_configs[] __initdata = {
 			[GPIOMUX_SUSPENDED] = &gpio_cam_i2c_config,
 		},
 	},
-	{
-		.gpio      = 78,	/* NFC CLK */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &gpio_nfc_config,
-			[GPIOMUX_SUSPENDED] = &gpio_nfc_sus_config,
-		},
-	},
 };
-
-static struct gpiomux_setting gpio_i2c_nfc_pvt_config = {
-		.func = GPIOMUX_FUNC_5, /*active 1*/ /* 0 */
-		.drv = GPIOMUX_DRV_2MA,
-		.pull = GPIOMUX_PULL_NONE,
-	};
-
-static struct msm_gpiomux_config msm_nfc_configs[] __initdata = {
-	{
-		.gpio   = 8,            /* BLSP1 QUP2 I2C_SDA */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &gpio_i2c_nfc_pvt_config,
-			[GPIOMUX_SUSPENDED] = &gpio_i2c_nfc_pvt_config,
-		},
-	},
-	{
-		.gpio   = 9,            /* BLSP1 QUP2 I2C_SCL */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &gpio_i2c_nfc_pvt_config,
-			[GPIOMUX_SUSPENDED] = &gpio_i2c_nfc_pvt_config,
-		},
-	},
-};
-
-
-static struct msm_gpiomux_config msm_atmel_configs[] __initdata = {
-	{
-		.gpio      = 0,		/* TOUCH RESET */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &atmel_reset_act_cfg,
-			[GPIOMUX_SUSPENDED] = &atmel_reset_sus_cfg,
-		},
-	},
-	{
-		.gpio      = 1,		/* TOUCH INT */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &atmel_int_act_cfg,
-			[GPIOMUX_SUSPENDED] = &atmel_int_sus_cfg,
-		},
-	},
-	{
-		.gpio      = 86,		/* BLSP1 QUP4 SPI_DATA_MOSI */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &gpio_spi_config,
-			[GPIOMUX_SUSPENDED] = &gpio_spi_susp_config,
-		},
-	},
-	{
-		.gpio      = 87,		/* BLSP1 QUP4 SPI_DATA_MISO */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &gpio_spi_config,
-			[GPIOMUX_SUSPENDED] = &gpio_spi_susp_config,
-		},
-	},
-	{
-		.gpio      = 89,		/* BLSP1 QUP4 SPI_CLK */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &gpio_spi_config,
-			[GPIOMUX_SUSPENDED] = &gpio_spi_susp_config,
-		},
-	},
-	{
-		.gpio      = 88,		/* BLSP1 QUP4 SPI_CS */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &gpio_spi_config,
-			[GPIOMUX_SUSPENDED] = &gpio_spi_susp_config,
-		},
-	},
-};
-
-static struct msm_gpiomux_config msm_focaltech_configs[] __initdata = {
-	{
-		.gpio      = 0,		/* TOUCH RESET */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &focaltech_reset_act_cfg,
-			[GPIOMUX_SUSPENDED] = &focaltech_reset_sus_cfg,
-		},
-	},
-	{
-		.gpio      = 1,		/* TOUCH INT */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &focaltech_int_act_cfg,
-			[GPIOMUX_SUSPENDED] = &focaltech_int_sus_cfg,
-		},
-	},
-	{
-		.gpio      = 86,		/* BLSP1 QUP4 SPI_DATA_MOSI */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &gpio_spi_config,
-			[GPIOMUX_SUSPENDED] = &gpio_spi_susp_config,
-		},
-	},
-	{
-		.gpio      = 87,		/* BLSP1 QUP4 SPI_DATA_MISO */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &gpio_spi_config,
-			[GPIOMUX_SUSPENDED] = &gpio_spi_susp_config,
-		},
-	},
-	{
-		.gpio      = 89,		/* BLSP1 QUP4 SPI_CLK */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &gpio_spi_config,
-			[GPIOMUX_SUSPENDED] = &gpio_spi_susp_config,
-		},
-	},
-	{
-		.gpio      = 88,		/* BLSP1 QUP4 SPI_CS */
-		.settings = {
-			[GPIOMUX_ACTIVE] = &gpio_spi_config,
-			[GPIOMUX_SUSPENDED] = &gpio_spi_susp_config,
-		},
-	},
-};
-
 
 static struct msm_gpiomux_config wcnss_5wire_interface[] = {
 	{
@@ -451,16 +272,10 @@ static struct gpiomux_setting cam_settings[] = {
 	},
 };
 
-static struct msm_gpiomux_config msm_non_qrd_configs[] __initdata = {
-	{
-		.gpio = 8, /* CAM1_STANDBY_N */
-		.settings = {
-			[GPIOMUX_ACTIVE]    = &cam_settings[3],
-			[GPIOMUX_SUSPENDED] = &gpio_suspend_config[1],
-		},
-	},
-};
-
+/*
+                                                       
+                                              
+ */
 static struct msm_gpiomux_config msm_sensor_configs[] __initdata = {
 	{
 		.gpio = 13, /* CAM_MCLK0 */
@@ -477,14 +292,21 @@ static struct msm_gpiomux_config msm_sensor_configs[] __initdata = {
 		},
 	},
 	{
-		.gpio = 16, /* CCI_I2C_SDA */
+		.gpio = 15, /* VT_CAM_RESET_N */
+		.settings = {
+			[GPIOMUX_ACTIVE]    = &cam_settings[3],
+			[GPIOMUX_SUSPENDED] = &gpio_suspend_config[1],
+		},
+	},
+	{
+		.gpio = 16, /* CAM_I2C_SDA */
 		.settings = {
 			[GPIOMUX_ACTIVE]    = &cam_settings[0],
 			[GPIOMUX_SUSPENDED] = &gpio_suspend_config[0],
 		},
 	},
 	{
-		.gpio = 17, /* CCI_I2C_SCL */
+		.gpio = 17, /* CAM_I2C_SCL */
 		.settings = {
 			[GPIOMUX_ACTIVE]    = &cam_settings[0],
 			[GPIOMUX_SUSPENDED] = &gpio_suspend_config[0],
@@ -493,40 +315,26 @@ static struct msm_gpiomux_config msm_sensor_configs[] __initdata = {
 	{
 		.gpio = 18, /* FLASH_LED_EN */
 		.settings = {
-			[GPIOMUX_ACTIVE]    = &cam_settings[3],
+			[GPIOMUX_ACTIVE]    = &cam_settings[0],
 			[GPIOMUX_SUSPENDED] = &gpio_suspend_config[1],
 		},
 	},
 	{
-		.gpio = 19, /* FLASH_LED_NOW */
+		.gpio = 20, /* CAM1_STANDBY_N */
 		.settings = {
 			[GPIOMUX_ACTIVE]    = &cam_settings[3],
 			[GPIOMUX_SUSPENDED] = &gpio_suspend_config[1],
 		},
 	},
 	{
-		.gpio = 8, /* CAM1_STANDBY_N */
+		.gpio = 21, /* CAM1_RESET_N */
 		.settings = {
 			[GPIOMUX_ACTIVE]    = &cam_settings[3],
 			[GPIOMUX_SUSPENDED] = &gpio_suspend_config[1],
 		},
 	},
 	{
-		.gpio = 15, /* CAM1_RST_N */
-		.settings = {
-			[GPIOMUX_ACTIVE]    = &cam_settings[3],
-			[GPIOMUX_SUSPENDED] = &gpio_suspend_config[1],
-		},
-	},
-	{
-		.gpio = 20, /* WEBCAM1_STANDBY */
-		.settings = {
-			[GPIOMUX_ACTIVE]    = &cam_settings[3],
-			[GPIOMUX_SUSPENDED] = &gpio_suspend_config[1],
-		},
-	},
-	{
-		.gpio = 21, /* WEBCAM2_RESET_N */
+		.gpio = 85, /* VANA_LDO_EN */
 		.settings = {
 			[GPIOMUX_ACTIVE]    = &cam_settings[3],
 			[GPIOMUX_SUSPENDED] = &gpio_suspend_config[1],
@@ -536,21 +344,28 @@ static struct msm_gpiomux_config msm_sensor_configs[] __initdata = {
 
 static struct msm_gpiomux_config msm_keypad_configs[] __initdata = {
 	{
-		.gpio = 72,
+		.gpio = 72,	/* Volume UP */
 		.settings = {
 			[GPIOMUX_ACTIVE]    = &gpio_keys_active,
 			[GPIOMUX_SUSPENDED] = &gpio_keys_suspend,
 		},
 	},
 	{
-		.gpio = 73,
+		.gpio = 73,	/* Volume Down */
 		.settings = {
 			[GPIOMUX_ACTIVE]    = &gpio_keys_active,
 			[GPIOMUX_SUSPENDED] = &gpio_keys_suspend,
 		},
 	},
 	{
-		.gpio = 74,
+		.gpio = 74,	/* Home */
+		.settings = {
+			[GPIOMUX_ACTIVE]    = &gpio_keys_active,
+			[GPIOMUX_SUSPENDED] = &gpio_keys_suspend,
+		},
+	},
+	{
+		.gpio = 75,	/* Q-Memo */
 		.settings = {
 			[GPIOMUX_ACTIVE]    = &gpio_keys_active,
 			[GPIOMUX_SUSPENDED] = &gpio_keys_suspend,
@@ -565,12 +380,21 @@ static struct gpiomux_setting sd_card_det_active_config = {
 	.dir = GPIOMUX_IN,
 };
 
+#ifdef CONFIG_MACH_LGE
+static struct gpiomux_setting sd_card_det_suspend_config = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_2MA,
+	.pull = GPIOMUX_PULL_DOWN,
+	.dir = GPIOMUX_IN,
+};
+#else
 static struct gpiomux_setting sd_card_det_suspend_config = {
 	.func = GPIOMUX_FUNC_GPIO,
 	.drv = GPIOMUX_DRV_2MA,
 	.pull = GPIOMUX_PULL_UP,
 	.dir = GPIOMUX_IN,
 };
+#endif
 
 static struct msm_gpiomux_config sd_card_det[] __initdata = {
 	{
@@ -582,80 +406,169 @@ static struct msm_gpiomux_config sd_card_det[] __initdata = {
 	},
 };
 
-static struct gpiomux_setting interrupt_gpio_active = {
+static struct gpiomux_setting mms100s_ts_int_act_cfg = {
 	.func = GPIOMUX_FUNC_GPIO,
-	.drv = GPIOMUX_DRV_6MA,
+	.drv = GPIOMUX_DRV_2MA,
 	.pull = GPIOMUX_PULL_UP,
+	.dir = GPIOMUX_IN,
 };
 
-static struct gpiomux_setting interrupt_gpio_suspend_pullup = {
+static struct gpiomux_setting mms100s_ts_int_sus_cfg = {
 	.func = GPIOMUX_FUNC_GPIO,
-	.drv = GPIOMUX_DRV_6MA,
-	.pull = GPIOMUX_PULL_UP,
-};
-
-static struct gpiomux_setting interrupt_gpio_suspend_pulldown = {
-	.func = GPIOMUX_FUNC_GPIO,
-	.drv = GPIOMUX_DRV_6MA,
-	.pull = GPIOMUX_PULL_UP,
-};
-
-static struct msm_gpiomux_config msm_interrupt_configs[] __initdata = {
-	{
-		.gpio = 77,	/* NFC_IRQ */
-		.settings = {
-			[GPIOMUX_ACTIVE]    = &interrupt_gpio_active,
-			[GPIOMUX_SUSPENDED] = &interrupt_gpio_suspend_pullup,
-		},
-	},
-	{
-		.gpio = 80,	/*ALSP_INT */
-		.settings = {
-			[GPIOMUX_ACTIVE]    = &interrupt_gpio_active,
-			[GPIOMUX_SUSPENDED] = &interrupt_gpio_suspend_pullup,
-		},
-	},
-	{
-		.gpio = 81,	/*ACCEL_INT1 */
-		.settings = {
-			[GPIOMUX_ACTIVE]    = &interrupt_gpio_active,
-			[GPIOMUX_SUSPENDED] = &interrupt_gpio_suspend_pulldown,
-		},
-	},
-	{
-		.gpio = 82,	/*ACCEL_INT2 */
-		.settings = {
-			[GPIOMUX_ACTIVE]    = &interrupt_gpio_active,
-			[GPIOMUX_SUSPENDED] = &interrupt_gpio_suspend_pulldown,
-		},
-	},
-};
-
-static struct gpiomux_setting gpio_cdc_dmic_cfg = {
-	.func = GPIOMUX_FUNC_1,
-	.drv = GPIOMUX_DRV_4MA,
+	.drv = GPIOMUX_DRV_2MA,
 	.pull = GPIOMUX_PULL_NONE,
+	.dir = GPIOMUX_IN,
+};
+
+static struct gpiomux_setting mms100s_ts_ldo_act_cfg = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_2MA,
+	.pull = GPIOMUX_PULL_NONE,
+	.dir = GPIOMUX_OUT_LOW,
+};
+
+static struct gpiomux_setting mms100s_ts_ldo_sus_cfg = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_2MA,
+	.pull = GPIOMUX_PULL_NONE,
+	.dir = GPIOMUX_OUT_LOW,
+};
+
+static struct gpiomux_setting synaptics_ts_int_act_cfg = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_2MA,
+	.pull = GPIOMUX_PULL_NONE,
+	.dir = GPIOMUX_IN,
+};
+
+static struct gpiomux_setting synaptics_ts_int_sus_cfg = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_2MA,
+	.pull = GPIOMUX_PULL_NONE,
+	.dir = GPIOMUX_IN,
+};
+
+static struct gpiomux_setting synaptics_ts_makerid_act_cfg = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_2MA,
+	.pull = GPIOMUX_PULL_NONE,
+	.dir = GPIOMUX_IN,
+};
+
+static struct gpiomux_setting synaptics_ts_makerid_sus_cfg = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_2MA,
+	.pull = GPIOMUX_PULL_NONE,
+	.dir = GPIOMUX_IN,
+};
+
+static struct gpiomux_setting synaptics_reset_cfg = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_2MA,
+	.pull = GPIOMUX_PULL_NONE,
+	.dir = GPIOMUX_OUT_HIGH,
 };
 
 
-static struct msm_gpiomux_config msm_cdc_dmic_configs[] __initdata = {
+static struct gpiomux_setting mms100s_ts_makerid_act_cfg = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_2MA,
+	.pull = GPIOMUX_PULL_UP,
+	.dir = GPIOMUX_IN,
+};
+
+static struct gpiomux_setting mms100s_ts_makerid_sus_cfg = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_2MA,
+	.pull = GPIOMUX_PULL_UP,
+	.dir = GPIOMUX_IN,
+};
+
+static struct msm_gpiomux_config synaptics_ts_configs[] __initdata = {
 	{
-		.gpio = 100,	/* DMIC CLK */
+		.gpio = 0,    /*TOUCH RESET*/
 		.settings = {
-			[GPIOMUX_SUSPENDED] = &gpio_cdc_dmic_cfg,
+			[GPIOMUX_ACTIVE] = &synaptics_reset_cfg,
+			[GPIOMUX_SUSPENDED] = &synaptics_reset_cfg,
 		},
 	},
 	{
-		.gpio = 101,	/* DMIC DATA */
+		.gpio = 1,	/*TOUCH INT*/
 		.settings = {
-			[GPIOMUX_SUSPENDED] = &gpio_cdc_dmic_cfg,
+			[GPIOMUX_ACTIVE] = &synaptics_ts_int_act_cfg,
+			[GPIOMUX_SUSPENDED] = &synaptics_ts_int_sus_cfg,
+		},
+	},
+	{
+		.gpio      = 76,	/* GPIO MAKER ID */
+		.settings = {
+			[GPIOMUX_ACTIVE]    = &synaptics_ts_makerid_act_cfg,
+			[GPIOMUX_SUSPENDED] = &synaptics_ts_makerid_sus_cfg,
+		},
+	},
+	{
+		.gpio      = 77,	/* GPIO MAKER ID 2 */
+		.settings = {
+			[GPIOMUX_ACTIVE]    = &synaptics_ts_makerid_act_cfg,
+			[GPIOMUX_SUSPENDED] = &synaptics_ts_makerid_sus_cfg,
 		},
 	},
 };
 
+static struct msm_gpiomux_config mms100s_ts_configs[] __initdata = {
+	{
+		.gpio      = 0,		/* MMS100s INT */
+		.settings = {
+			[GPIOMUX_ACTIVE]    = &mms100s_ts_int_act_cfg,
+			[GPIOMUX_SUSPENDED] = &mms100s_ts_int_sus_cfg,
+		},
+	},
+	{
+		.gpio      = 76,	/* GPIO MAKER ID */
+		.settings = {
+			[GPIOMUX_ACTIVE]    = &mms100s_ts_makerid_act_cfg,
+			[GPIOMUX_SUSPENDED] = &mms100s_ts_makerid_sus_cfg,
+		},
+	},
+	{
+		.gpio      = 62,	/* GPIO LDO */
+		.settings = {
+			[GPIOMUX_ACTIVE]    = &mms100s_ts_ldo_act_cfg,
+			[GPIOMUX_SUSPENDED] = &mms100s_ts_ldo_sus_cfg,
+		},
+	},
+};
+
+/*                                                                 */
+#ifdef CONFIG_MACH_LGE
+static struct gpiomux_setting main_cam_id_gpio_act_config = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_2MA,
+	.pull = GPIOMUX_PULL_UP,
+	.dir = GPIOMUX_IN
+};
+static struct gpiomux_setting main_cam_id_gpio_sus_config = {
+	.func = GPIOMUX_FUNC_GPIO,
+	.drv = GPIOMUX_DRV_2MA,
+	.pull = GPIOMUX_PULL_NONE,
+	.dir = GPIOMUX_IN
+};
+
+static struct msm_gpiomux_config main_cam_id_gpio[] __initdata = {
+	{
+		.gpio = 86,
+		.settings = {
+			[GPIOMUX_ACTIVE] = &main_cam_id_gpio_act_config,
+			[GPIOMUX_SUSPENDED] = &main_cam_id_gpio_sus_config,
+		}
+	}
+};
+#endif /*                 */
+/*                                                                 */
 void __init msm8610_init_gpiomux(void)
 {
 	int rc;
+	hw_rev_type revision = lge_get_board_revno();
 
 	rc = msm_gpiomux_init_dt();
 	if (rc) {
@@ -664,13 +577,16 @@ void __init msm8610_init_gpiomux(void)
 	}
 
 	msm_gpiomux_install(msm_blsp_configs, ARRAY_SIZE(msm_blsp_configs));
-	if (of_board_is_qrd()) {
-		msm_gpiomux_install(msm_focaltech_configs,
-			ARRAY_SIZE(msm_focaltech_configs));
-	} else {
-		msm_gpiomux_install(msm_atmel_configs,
-			ARRAY_SIZE(msm_atmel_configs));
+
+	if(revision >= HW_REV_B)  /*for Synaptics S2202 Touch IC */
+	{
+		printk(KERN_INFO"[%s][TOUCH] HW_Revision = %d , use Synaptics", __func__, revision );	
+		msm_gpiomux_install(synaptics_ts_configs, ARRAY_SIZE(synaptics_ts_configs));
+	} else { /*for Melfas Touch IC : Rev.A*/
+        printk(KERN_INFO"[%s][TOUCH] HW_Revision = %d ", __func__, revision );
+		msm_gpiomux_install(mms100s_ts_configs, ARRAY_SIZE(mms100s_ts_configs));
 	}
+
 	msm_gpiomux_install(wcnss_5wire_interface,
 			ARRAY_SIZE(wcnss_5wire_interface));
 	msm_gpiomux_install_nowrite(msm_lcd_configs,
@@ -679,18 +595,10 @@ void __init msm8610_init_gpiomux(void)
 				ARRAY_SIZE(msm_keypad_configs));
 	msm_gpiomux_install(sd_card_det, ARRAY_SIZE(sd_card_det));
 	msm_gpiomux_install(msm_sensor_configs, ARRAY_SIZE(msm_sensor_configs));
+/*                                                                                  */
+	msm_gpiomux_install(main_cam_id_gpio, ARRAY_SIZE(main_cam_id_gpio));	/* MAIN_CAM_ID */
+/*                                                                                  */
 	msm_gpiomux_install(msm_gpio_int_configs,
 			ARRAY_SIZE(msm_gpio_int_configs));
-	if (of_board_is_qrd()) {
-		msm_gpiomux_install(msm_interrupt_configs,
-			ARRAY_SIZE(msm_interrupt_configs));
-		msm_gpiomux_install(msm_nfc_configs,
-			ARRAY_SIZE(msm_nfc_configs));
-	} else {
-		msm_gpiomux_install(msm_non_qrd_configs,
-			ARRAY_SIZE(msm_non_qrd_configs));
-	}
-	if (of_board_is_cdp())
-		msm_gpiomux_install(msm_cdc_dmic_configs,
-			ARRAY_SIZE(msm_cdc_dmic_configs));
+
 }

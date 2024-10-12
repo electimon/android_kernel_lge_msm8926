@@ -12,6 +12,12 @@ config ANDROID_BINDER_IPC
 	bool "Android Binder IPC Driver"
 	default n
 
+
+config LGE_ANDROID_BINDER_IPC_CHECK
+	bool "Additional checking for transaction"
+	depends on ANDROID_BINDER_IPC
+	default n
+
 config ASHMEM
 	bool "Enable the Anonymous Shared Memory Subsystem"
 	default n
@@ -94,6 +100,13 @@ config ANDROID_INTF_ALARM_DEV
 	  Provides non-wakeup and rtc backed wakeup alarms based on rtc or
 	  elapsed realtime, and a non-wakeup alarm on the monotonic clock.
 	  Also exports the alarm interface to user-space.
+
+config LGE_ANDROID_LOW_MEMORY_KILLER_IMPROVE
+        bool "Android Low Memory Killer: improve LMK behavior to sync up with kswapd"
+        depends on ANDROID_LOW_MEMORY_KILLER
+        default n
+        ---help---
+          adjust other file pages to sync up with kswapd
 
 endif # if ANDROID
 

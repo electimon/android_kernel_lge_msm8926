@@ -261,7 +261,7 @@ static struct notifier_block wnb = {
 	.notifier_call = wcnss_notif_cb,
 };
 
-#define NVBIN_FILE "wlan/prima/WCNSS_qcom_wlan_nv.bin"
+#define NVBIN_FILE "wlan/prima/WCNSS_qcom_wlan_nv_boot.bin"
 
 /*
  * On SMD channel 4K of maximum data can be transferred, including message
@@ -925,7 +925,9 @@ void wcnss_reset_intr(void)
 {
 	if (wcnss_hardware_type() == WCNSS_PRONTO_HW) {
 		wcnss_pronto_log_debug_regs();
+#ifdef CONFIG_WCNSS_REGISTER_DUMP_ON_BITE
 		wcnss_log_iris_regs();
+#endif
 		wmb();
 		__raw_writel(1 << 16, penv->fiq_reg);
 	} else {

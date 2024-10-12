@@ -645,13 +645,16 @@ static int mdss_mdp_rotator_finish(struct mdss_mdp_rotator_session *rot)
 	if (rot_pipe) {
 		struct mdss_mdp_mixer *mixer = rot_pipe->mixer;
 		mdss_mdp_pipe_destroy(rot_pipe);
-		tmp = mdss_mdp_ctl_mixer_switch(mixer->ctl,
-				MDSS_MDP_WB_CTL_TYPE_BLOCK);
-		if (!tmp)
-			return -EINVAL;
-		else
-			mixer = tmp->mixer_left;
-		mdss_mdp_wb_mixer_destroy(mixer);
+			if (mixer) {
+				tmp = mdss_mdp_ctl_mixer_switch(mixer->ctl,
+					MDSS_MDP_WB_CTL_TYPE_BLOCK);
+				if (!tmp)
+					return -EINVAL;
+				else
+					mixer = tmp->mixer_left;
+				if (mixer)
+					mdss_mdp_wb_mixer_destroy(mixer);
+			}
 	}
 	return ret;
 }

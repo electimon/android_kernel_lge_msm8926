@@ -10,6 +10,7 @@
  * GNU General Public License for more details.
  */
 
+
 #include <linux/slab.h>
 #include <linux/wait.h>
 #include <linux/sched.h>
@@ -26,6 +27,11 @@
 
 #include "audio_acdb.h"
 
+#define LVVE
+#if defined(LVVE)
+#define VPM_TX_SM_LVVEFQ    (0x1000BFF0)
+#define VPM_TX_DM_LVVEFQ    (0x1000BFF1)
+#endif
 
 #define TIMEOUT_MS 1000
 
@@ -37,6 +43,8 @@
 
 #define ULL_SUPPORTED_SAMPLE_RATE 48000
 #define ULL_MAX_SUPPORTED_CHANNEL 2
+
+
 enum {
 	ADM_RX_AUDPROC_CAL,
 	ADM_TX_AUDPROC_CAL,
@@ -1189,11 +1197,21 @@ int adm_open(int port_id, int path, int rate, int channel_mode, int topology,
 			open.endpoint_id_2 = 0xFFFF;
 		} else if (this_adm.ec_ref_rx && (path != 1)) {
 			open.endpoint_id_2 = this_adm.ec_ref_rx;
+#if !defined(CONFIG_SND_SOC_HFP)
 			this_adm.ec_ref_rx = -1;
+#endif
 		}
+
+#if defined(CONFIG_SND_SOC_HFP)
+		pr_debug("%s : set ec_ref_rx to %x, (this_adm.ec_ref_rx %x)\n", __func__, open.endpoint_id_2, this_adm.ec_ref_rx);
+#endif
 
 		open.topology_id = topology;
 		if ((open.topology_id == VPM_TX_SM_ECNS_COPP_TOPOLOGY) ||
+#if defined(LVVE)
+			(open.topology_id == VPM_TX_SM_LVVEFQ)||
+			(open.topology_id == VPM_TX_DM_LVVEFQ)||
+#endif
 			(open.topology_id == VPM_TX_DM_FLUENCE_COPP_TOPOLOGY) ||
 			(open.topology_id == VPM_TX_DM_RFECNS_COPP_TOPOLOGY))
 				rate = 16000;

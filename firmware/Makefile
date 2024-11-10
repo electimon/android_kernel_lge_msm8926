@@ -145,10 +145,10 @@ fw-shipped-$(CONFIG_TOUCHSCREEN_LGE_AIT_MELFAS) += $(ait_fw_files)
 endif
 else
 fw-shipped-$(CONFIG_TOUCHSCREEN_MELFAS_MMS136) += melfas/mms100a_core54_v01.mfsb
-fw-shipped-$(CONFIG_TOUCHSCREEN_MELFAS_MMS136) += $(touch_fw_files)
+#fw-shipped-$(CONFIG_TOUCHSCREEN_MELFAS_MMS136) += $(touch_fw_files)
 
 fw-shipped-$(CONFIG_TOUCHSCREEN_MELFAS_MMS100S) += melfas/mms100s_core32_v01.mfsb
-fw-shipped-$(CONFIG_TOUCHSCREEN_MELFAS_MMS100S) += $(touch_fw_files)
+#fw-shipped-$(CONFIG_TOUCHSCREEN_MELFAS_MMS100S) += $(touch_fw_files)
 ifdef CONFIG_MACH_MSM8926_VFP_KR
 fw-shipped-$(CONFIG_TOUCHSCREEN_LGE_MELFAS) += melfas/$(TARGET_PRODUCT)/vfp_lgu_kr_rev_a_v001.mfsb
 else

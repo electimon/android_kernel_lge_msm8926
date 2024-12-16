@@ -385,6 +385,13 @@ config BACKLIGHT_LM3697
 	  Say Y to enable the backlight driver for TI LM3697.
 	  Up to 3 backlight strings and 11 bit dimming is supported.
 	  PWM brightness control is also supported.
+
+config BACKLIGHT_RT8542
+        tristate "Backlight driver for rt8542 visualisation device"
+        depends on BACKLIGHT_CLASS_DEVICE
+        help
+          To compile this driver as a module, choose M here: the module will be
+          called rt8542 driver.
 	  
 endif # BACKLIGHT_CLASS_DEVICE
 

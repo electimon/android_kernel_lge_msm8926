@@ -32,7 +32,7 @@
 #include <linux/earlysuspend.h>
 #include <mach/board_lge.h>
 
-#define I2C_BL_NAME                              "qcom,led-flash"
+#define I2C_BL_NAME                              "rt8542"
 #define MAX_BRIGHTNESS_RT8542                    0x7D			// Linear BLED Brightness Control - 83%
 #define MIN_BRIGHTNESS_RT8542                    0x04
 #define DEFAULT_BRIGHTNESS                       0x66
@@ -601,8 +601,10 @@ static int rt8542_probe(struct i2c_client *i2c_dev,
 			return -ENOMEM;
 		}
 		err = rt8542_parse_dt(&i2c_dev->dev, pdata);
-		if (err != 0)
+		if (err != 0) {
+			pr_err("rt8542: Failed to parse dt");
 			return err;
+		}
 	} else {
 		pdata = i2c_dev->dev.platform_data;
 	}
@@ -611,6 +613,7 @@ static int rt8542_probe(struct i2c_client *i2c_dev,
 #endif
 
 	if (pdata->gpio && gpio_request(pdata->gpio, "rt8542 reset") != 0) {
+		dev_err(&i2c_dev->dev, "cant get reset gpio!");
 		return -ENODEV;
 	}
 
@@ -704,10 +707,16 @@ static int rt8542_remove(struct i2c_client *i2c_dev)
 
 #ifdef CONFIG_OF
 static struct of_device_id rt8542_match_table[] = {
-	{ .compatible = "qcom,led-flash",},
+	{ .compatible = "richtek,rt8542",},
 	{ },
 };
 #endif
+
+static const struct i2c_device_id rt8542_id[] = {
+        { "rt8542", 0 },
+        { }
+};
+
 
 static struct i2c_driver main_rt8542_driver = {
 	.probe = rt8542_probe,
@@ -718,9 +727,10 @@ static struct i2c_driver main_rt8542_driver = {
 		.name = I2C_BL_NAME,
 		.owner = THIS_MODULE,
 #ifdef CONFIG_OF
-		.of_match_table = rt8542_match_table,
+		.of_match_table = of_match_ptr(rt8542_match_table),
 #endif
 	},
+	.id_table = rt8542_id,
 };
 
 static int __init lcd_backlight_init(void)

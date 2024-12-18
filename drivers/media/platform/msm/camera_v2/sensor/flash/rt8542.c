@@ -14,7 +14,7 @@
 #include <linux/export.h>
 #include "msm_led_flash.h"
 
-#define FLASH_NAME "qcom,led-flash"
+#define FLASH_NAME "rt8542-led-flash"
 
 /*#define CONFIG_MSMB_CAMERA_DEBUG*/
 #undef CDBG
@@ -34,14 +34,14 @@ static void __exit msm_flash_rt8542_i2c_remove(void)
 }
 
 static const struct of_device_id rt8542_i2c_trigger_dt_match[] = {
-	{.compatible = "qcom,led-flash"},
+	{.compatible = "qcom,rt8542-led-flash"},
 	{}
 };
 
 MODULE_DEVICE_TABLE(of, rt8542_i2c_trigger_dt_match);
 
 static const struct i2c_device_id flash_i2c_id[] = {
-	{"qcom,led-flash", (kernel_ulong_t)&fctrl},
+	{"qcom,rt-led-flash", (kernel_ulong_t)&fctrl},
 	{ }
 };
 

@@ -14,7 +14,7 @@
 &soc {
 	i2c@0 {
 		led_flash0: qcom,led-flash@39 {
-			compatible = "qcom,led-flash";
+			compatible = "qcom,rt8542-led-flash";
 			status = "ok";
 			reg = <0x39>;
 

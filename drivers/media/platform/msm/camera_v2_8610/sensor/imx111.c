@@ -75,7 +75,7 @@ static struct msm_sensor_power_setting imx111_power_setting_rev_0[] = {
 	},
 };
 
-#if !defined(CONFIG_MACH_MSM8X10_W6)
+#if !defined(CONFIG_MACH_MSM8X10_W6) && !defined(CONFIG_MACH_MSM8X10_W5TS_GLOBAL_COM)
 static struct msm_sensor_power_setting imx111_power_setting_rev_a[] = {
 	 /* Set GPIO_RESET to low to disable power on reset*/
 	{
@@ -103,6 +103,12 @@ static struct msm_sensor_power_setting imx111_power_setting_rev_a[] = {
 		.delay = 1,
 	},
 	{
+		.seq_type = SENSOR_CLK,	//MCLK order is changed. 20140103. younjung.park
+		.seq_val = SENSOR_CAM_MCLK,
+		.config_val = 0,
+		.delay = 1,
+	},
+	{
 		.seq_type = SENSOR_GPIO,
 		.seq_val = SENSOR_GPIO_STANDBY,
 		.config_val = GPIO_OUT_HIGH,
@@ -115,12 +121,6 @@ static struct msm_sensor_power_setting imx111_power_setting_rev_a[] = {
 		.delay = 30,
 	},
 	{
-		.seq_type = SENSOR_CLK,
-		.seq_val = SENSOR_CAM_MCLK,
-		.config_val = 0,
-		.delay = 1,
-	},
-	{
 		.seq_type = SENSOR_I2C_MUX,
 		.seq_val = 0,
 		.config_val = 0,
@@ -128,7 +128,7 @@ static struct msm_sensor_power_setting imx111_power_setting_rev_a[] = {
 	},
 };
 #endif
-#if defined(CONFIG_MACH_MSM8X10_W5DS_GLOBAL_COM) || defined(CONFIG_MACH_MSM8X10_W5_GLOBAL_COM)|| defined(CONFIG_MACH_MSM8X10_W6)
+#if defined(CONFIG_MACH_MSM8X10_W5DS_GLOBAL_COM) || defined(CONFIG_MACH_MSM8X10_W5_GLOBAL_COM) || defined(CONFIG_MACH_MSM8X10_W5N_GLOBAL_COM) || defined(CONFIG_MACH_MSM8X10_W6) || defined(CONFIG_MACH_MSM8X10_W5TS_GLOBAL_COM)
 static struct msm_sensor_power_setting imx111_power_setting_rev_b[] = {
 	 /* Set GPIO_RESET to low to disable power on reset*/
 	{
@@ -260,7 +260,7 @@ static int __init imx111_init_module(void)
 			imx111_s_ctrl.power_setting_array.size = ARRAY_SIZE(imx111_power_setting_rev_0);
 			break;
 		case HW_REV_A:
-#if defined(CONFIG_MACH_MSM8X10_W5DS_GLOBAL_COM) || defined(CONFIG_MACH_MSM8X10_W5_GLOBAL_COM)
+#if defined(CONFIG_MACH_MSM8X10_W5DS_GLOBAL_COM) || defined(CONFIG_MACH_MSM8X10_W5_GLOBAL_COM) || defined(CONFIG_MACH_MSM8X10_W5N_GLOBAL_COM)
 			printk("%s: Sensor power is set as Rev. %d\n", __func__,rev_type);
 			imx111_s_ctrl.power_setting_array.power_setting = imx111_power_setting_rev_a;
 			imx111_s_ctrl.power_setting_array.size = ARRAY_SIZE(imx111_power_setting_rev_a);
@@ -272,7 +272,7 @@ static int __init imx111_init_module(void)
 		case HW_REV_B:
 		default:
 			printk("%s: Sensor power is set as Rev.%d(Line:%d)\n", __func__,rev_type, __LINE__);
-#if defined(CONFIG_MACH_MSM8X10_W5DS_GLOBAL_COM) || defined(CONFIG_MACH_MSM8X10_W5_GLOBAL_COM) || defined(CONFIG_MACH_MSM8X10_W6)
+#if defined(CONFIG_MACH_MSM8X10_W5DS_GLOBAL_COM) || defined(CONFIG_MACH_MSM8X10_W5_GLOBAL_COM) || defined(CONFIG_MACH_MSM8X10_W5N_GLOBAL_COM) || defined(CONFIG_MACH_MSM8X10_W6)|| defined(CONFIG_MACH_MSM8X10_W5TS_GLOBAL_COM)
 			imx111_s_ctrl.power_setting_array.power_setting = imx111_power_setting_rev_b;
 			imx111_s_ctrl.power_setting_array.size = ARRAY_SIZE(imx111_power_setting_rev_b);
 #else

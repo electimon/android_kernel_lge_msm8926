@@ -565,8 +565,8 @@ enum msm_sensor_cfg_type_t {
 	CFG_SET_AEC_ROI,
 	CFG_SET_AWB_LOCK,
 	CFG_SET_AEC_LOCK,
-#ifndef CONFIG_ARCH_MSM8610
 	CFG_SET_INIT_SETTING_VT,
+#ifndef CONFIG_ARCH_MSM8610
 /* LGE_CHANGE_E, Enable touch AE in soc sensor , 2013-11-12, dongsu.bag@lge.com */
 	CFG_SET_REGISTER_UPDATE,		/* LGE_CHANGE . To fast tune register. sujeong.kwon@lge.com 2014.03.22*/
 /* LGE_FEATURE_APLUS */
